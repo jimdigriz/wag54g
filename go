@@ -12,8 +12,11 @@ ar7flashtools () {
 buildroot () {
 	ln -s -f -T ../../config/buildroot.config src/buildroot/.config
 
+	mkdir -p dl
+	ln -s -f -T ../../dl src/buildroot
+
 	export UCLIBC_CONFIG_FILE=../../config/uclibc.config 
-        export BUSYBOX_CONFIG_FILE=../../config/busybox.config
+	export BUSYBOX_CONFIG_FILE=../../config/busybox.config
 
 	make -C src/buildroot oldconfig
 	make -C src/buildroot
