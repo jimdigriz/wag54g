@@ -57,11 +57,39 @@ buildroot () {
 	make -C src/buildroot oldconfig
 	make -C src/buildroot
 
-	rsync -a src/buildroot/output/target/ rootfs
+	rsync -rl src/buildroot/output/target/ rootfs
 }
 
 customise () {
+	rsync -rl overlay/ rootfs
+
 	rm rootfs/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
+
+	rm rootfs/etc/init.d/S01logging
+	rm rootfs/etc/init.d/S50dropbear
+
+	sed -i -e 's/ext2/auto/' rootfs/etc/fstab
+	sed -i -e 's/tmpfs/ramfs/' rootfs/etc/fstab
+
+	# misc unneeded bits
+        rm -rf rootfs/home/ftp
+        rm -rf rootfs/var/lib
+        rm -rf rootfs/var/pcmcia
+        rm -rf rootfs/usr/share/udhcpc
+        rm -rf rootfs/share/man
+
+        rm -f rootfs/usr/sbin/pppdump
+        rm -f rootfs/usr/sbin/pppstats
+        rm -f rootfs/usr/sbin/chat
+
+        DELETE="minconn passprompt passwordfd winbind openl2tp pppol2tp"
+        for D in $DELETE; do
+                rm -f rootfs/usr/lib/pppd/2.4.5/$D.so
+        done
+
+        rm -f rootfs/lib/modules/*/source
+        rm -f rootfs/lib/modules/*/build
+        rm -f rootfs/lib/modules/*/modules.*
 }
 
 sangam () {
@@ -102,6 +130,33 @@ pppoe () {
 	cd ../../
 }
 
+bake () {
+	objcopy -S -O srec --srec-forceS3 src/buildroot/output/build/linux-$BR2_LINUX_KERNEL_VERSION/vmlinuz vmlinuz.srec
+
+	tools/srec2bin vmlinuz.srec vmlinuz.bin
+
+	if [ $(wc -c vmlinuz.bin | cut -d' ' -f1) -gt 786432 ]; then
+		echo kernel too big
+		exit 1
+	fi
+
+	DEVTABLE=$(mktemp)
+
+	cat <<'EOF' > "$DEVTABLE"
+/bin/busybox    f       4755    0       0       -       -       -       -       -
+EOF
+
+	/usr/sbin/mkfs.jffs2 -D "$DEVTABLE" -X zlib -x lzo -x rtime -e 65536 -n -p -t -l -d rootfs --squash -o fs.img
+	if [ $(wc -c fs.img | cut -d' ' -f1) -gt 3211264 ]; then
+		echo filesystem too big
+		exit 1
+	fi
+
+	rm "$DEVTABLE"
+
+	( dd if=/dev/zero bs=16 count=1; dd if=vmlinuz.bin bs=786432 conv=sync; cat fs.img ) | tools/addpattern -o firmware-code.bin -p WA21
+}
+
 git submodule init
 git submodule update
 
@@ -125,5 +180,7 @@ export CROSS_COMPILE="$BASEDIR/src/buildroot/output/host/usr/bin/mipsel-linux-"
 sangam
 
 customise
+
+bake
 
 exit 0

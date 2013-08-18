@@ -6,3 +6,7 @@ src/sangam_atm*
 src/linux-atm*
 dl
 tools
+rootfs
+vmlinuz.*
+fs.img
+firmware-code.bin
