@@ -56,10 +56,16 @@ buildroot () {
 
 	make -C src/buildroot oldconfig
 	make -C src/buildroot
+
+	rsync -a src/buildroot/output/target/ rootfs
+}
+
+customise () {
+	rm rootfs/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
 }
 
 sangam () {
-	[ -f src/sangam_atm-D7.05.01.00/tiatm.ko ] && return
+	[ -f rootfs/lib/modules/$BR2_LINUX_KERNEL_VERSION/kernel/drivers/net/tiatm.ko ] && return
 
 	wget -P src -N http://downloads.openwrt.org/sources/sangam_atm-D7.05.01.00-R1.tar.bz2
 
@@ -72,33 +78,34 @@ sangam () {
 	patch -p1 -f -d src/sangam_atm-D7.05.01.00 < patches/sangam_atm.patch
 
 	ARCH=mips make -C src/sangam_atm-D7.05.01.00
+
+	mkdir -p rootfs/lib/firmware
+	cp src/sangam_atm-D7.05.01.00/ar0700mp.bin rootfs/lib/firmware/ar0700xx.bin
+	cp src/sangam_atm-D7.05.01.00/tiatm.ko rootfs/lib/modules/$BR2_LINUX_KERNEL_VERSION/kernel/drivers/net
 }
 
 pppoe () {
-	[ -x src/linux-atm-2.5.2/src/br2684/br2684ctl ] && return
+	[ -x rootfs/sbin/br2684ctl ] && return
 
 	wget -P src -N --content-disposition http://sourceforge.net/projects/linux-atm/files/latest/download
 
 	tar -xC src -f src/linux-atm-2.5.2.tar.gz
 
+	OLDPWD="$(pwd)"
+
 	cd src/linux-atm-2.5.2
 
-	./configure --with-kernel-headers=$KERNELDIR/include --host=mipsel-linux
-	make -C src/lib
-	make -C src/br2684
+	./configure --prefix="$BASEDIR/rootfs" --with-kernel-headers=$KERNELDIR/include --host=mipsel-linux
+	make -C src/lib install
+	make -C src/br2684 install
 
-	cd ../..
-
-	#$ cp ../../../linux-atm/src/br2684/.libs/br2684ctl usr/sbin
-	#$ cp ../../../linux-atm/src/lib/.libs/libatm.so.1.0.0 usr/lib
-	#$ /usr/src/wag54g/buildroot/output/host/usr/bin/mipsel-linux-sstrip usr/sbin/br2684ctl
-	#$ /usr/src/wag54g/buildroot/output/host/usr/bin/mipsel-linux-sstrip usr/lib/libatm.so.1.0.0
-	#$ ln -s libatm.so.1.0.0 usr/lib/libatm.so
-	#$ ln -s libatm.so.1.0.0 usr/lib/libatm.so.1
+	cd ../../
 }
 
 git submodule init
 git submodule update
+
+BASEDIR="$(pwd)"
 
 #VERSION_OPENWRT=$(git --git-dir=src/openwrt/.git rev-parse HEAD | cut -c 1-8)
 
@@ -111,10 +118,12 @@ ar7flashtools
 buildroot
 
 eval $(grep BR2_LINUX_KERNEL_VERSION src/buildroot/.config)
-export KERNELDIR="$(pwd)/src/buildroot/output/build/linux-${BR2_LINUX_KERNEL_VERSION}"
-export CROSS_COMPILE="$(pwd)/src/buildroot/output/host/usr/bin/mipsel-linux-"
+export KERNELDIR="$BASEDIR/src/buildroot/output/build/linux-$BR2_LINUX_KERNEL_VERSION"
+export CROSS_COMPILE="$BASEDIR/src/buildroot/output/host/usr/bin/mipsel-linux-"
 
 [ "$PPPOE" ] && pppoe
 sangam
+
+customise
 
 exit 0
