@@ -2,5 +2,7 @@
 !.gitignore
 !.gitmodules
 
+src/sangam_atm*
+patches
 dl
 tools
