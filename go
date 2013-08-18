@@ -59,6 +59,8 @@ buildroot () {
 }
 
 sangam () {
+	[ -f src/sangam_atm-D7.05.01.00/tiatm.ko ] && return
+
 	wget -P src -N http://downloads.openwrt.org/sources/sangam_atm-D7.05.01.00-R1.tar.bz2
 
 	rm -rf src/sangam_atm-D7.05.01.00
@@ -67,10 +69,14 @@ sangam () {
 	find src/openwrt/package/kernel/ar7-atm/patches-D7.05.01.00 -type f -name '*.patch' \
 		| xargs -I{} sh -c "patch -p1 -f -d src/sangam_atm-D7.05.01.00 < '{}'"
 
-	make -C src/sangam_atm-D7.05.01.00
+	patch -p1 -f -d src/sangam_atm-D7.05.01.00 < patches/sangam_atm.patch
+
+	ARCH=mips make -C src/sangam_atm-D7.05.01.00
 }
 
 pppoe () {
+	[ -x src/linux-atm-2.5.2/src/br2684/br2684ctl ] && return
+
 	wget -P src -N --content-disposition http://sourceforge.net/projects/linux-atm/files/latest/download
 
 	tar -xC src -f src/linux-atm-2.5.2.tar.gz
@@ -104,10 +110,11 @@ ar7flashtools
 
 buildroot
 
-export KERNELDIR="$(pwd)/src/buildroot/output/build/linux-3.10.7"
+eval $(grep BR2_LINUX_KERNEL_VERSION src/buildroot/.config)
+export KERNELDIR="$(pwd)/src/buildroot/output/build/linux-${BR2_LINUX_KERNEL_VERSION}"
 export CROSS_COMPILE="$(pwd)/src/buildroot/output/host/usr/bin/mipsel-linux-"
 
 [ "$PPPOE" ] && pppoe
-#sangam
+sangam
 
 exit 0
