@@ -2,12 +2,12 @@
 
 set -eu
 
-DEV=$(basedir $(dirname $0))
+DEV=ttyS0
 BAUD=38400
 
 exec </dev/$DEV >/dev/$DEV 2>&1
 
-reset
+#reset
 stty sane; stty ispeed $BAUD; stty ospeed $BAUD
 
 printf "%s login: " "`hostname`"

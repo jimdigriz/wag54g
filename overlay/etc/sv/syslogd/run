@@ -2,4 +2,5 @@
 
 set -eu
 
-exec /sbin/syslogd -m 0
+exec 2>&1
+exec /sbin/syslogd -n -m 0

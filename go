@@ -42,7 +42,8 @@ patches () {
 	#src/openwrt/target/linux/ar7/patches-3.9/950-cpmac_titan.patch
 	#src/openwrt/target/linux/ar7/patches-3.9/972-cpmac_fixup.patch
 
-	ln -s -f -T ../../src/openwrt/target/linux/ar7/patches-3.9/500-serial_kludge.patch patches/linux/linux-openwrt.500-serial-kludge.patch
+	ln -s -f -T ../cmdline-parts.patch patches/linux/linux-digriz.500-cmdline-parts.patch
+	#ln -s -f -T ../../src/openwrt/target/linux/ar7/patches-3.9/500-serial_kludge.patch patches/linux/linux-openwrt.500-serial-kludge.patch
 }
 
 buildroot () {
@@ -63,6 +64,8 @@ buildroot () {
 customise () {
 	rsync -rl overlay/ rootfs
 
+	find rootfs -type f -name .empty -delete
+
 	rm rootfs/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
 
 	rm rootfs/etc/init.d/S01logging
@@ -70,6 +73,7 @@ customise () {
 
 	sed -i -e 's/ext2/auto/' rootfs/etc/fstab
 	sed -i -e 's/tmpfs/ramfs/' rootfs/etc/fstab
+	sed -i -e 's/^devpts/#devpts/' rootfs/etc/fstab
 
 	# misc unneeded bits
         rm -rf rootfs/home/ftp
@@ -90,6 +94,9 @@ customise () {
         rm -f rootfs/lib/modules/*/source
         rm -f rootfs/lib/modules/*/build
         rm -f rootfs/lib/modules/*/modules.*
+
+	cp -a src/buildroot/output/host/usr/mipsel-buildroot-linux-uclibc/lib/libgcc_s.so* rootfs/lib
+	./src/buildroot/output/host/usr/bin/mipsel-linux-sstrip rootfs/lib/libgcc_s.so.1
 }
 
 sangam () {
@@ -143,7 +150,8 @@ bake () {
 	DEVTABLE=$(mktemp)
 
 	cat <<'EOF' > "$DEVTABLE"
-/bin/busybox    f       4755    0       0       -       -       -       -       -
+# <name>	<type>	<mode>	<uid>	<gid>	<major>	<minor>	<start>	<inc>	<count>
+/bin/busybox	f	4755	0	0	-	-	-	-	-
 EOF
 
 	/usr/sbin/mkfs.jffs2 -D "$DEVTABLE" -X zlib -x lzo -x rtime -e 65536 -n -p -t -l -d rootfs --squash -o fs.img
@@ -182,5 +190,7 @@ sangam
 customise
 
 bake
+
+#echo -e "mode binary\nconnect 192.168.0.1\nput firmware-code.bin" | tftp
 
 exit 0

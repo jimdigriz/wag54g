@@ -1,0 +1,28 @@
+#! /bin/sh
+#
+# runsv		This script sets up and primes runsv.
+#
+
+case "$1" in
+	start|"")
+		if [ "$VERBOSE" != no ]
+		then
+			echo -n "Prepping /var/service for runsvdir... "
+		fi
+		[ -d /tmp/service ] || mkdir /tmp/service
+		[ -h /var/service ] || ln -s /tmp/service /var
+		for SERVICE in $(ls -1 /etc/sv); do
+			cp -r /etc/sv/$SERVICE /var/service
+		done
+		[ "$VERBOSE" != no ] && echo "done."
+		;;
+	stop)
+		for SERVICE in $(ls -1 /var/service); do
+			rm -rf /tmp/service/$SERVICE
+		done
+		;;
+	*)
+		echo "Usage: runsv {start|stop}" >&2
+		exit 1
+		;;
+esac

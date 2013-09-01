@@ -3,5 +3,4 @@
 set -eu
 
 exec 2>&1
-
 exec /usr/sbin/ntpd -n -l -p uk.pool.ntp.org

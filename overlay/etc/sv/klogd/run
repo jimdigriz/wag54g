@@ -2,4 +2,5 @@
 
 set -eu
 
-exec /sbin/klogd
+exec 2>&1
+exec /sbin/klogd -n
