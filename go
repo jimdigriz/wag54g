@@ -19,7 +19,7 @@ done
 shift $(expr $OPTIND - 1)
 
 ar7flashtools () {
-	mkdir -p tools
+	mkdir -p toolst
 
 	[ -x tools/srec2bin ] \
 		|| gcc -o tools/srec2bin src/openwrt/tools/firmware-utils/src/srec2bin.c
@@ -147,7 +147,7 @@ EOF
 	if [ "$WAN6IP" != "${WAN6IP#2002:}" ]; then
 		cat <<EOF >> rootfs/etc/network/interfaces
 
-# 6to4 destination optimisation
+# FIXME: we do not get unreachable whilst WAN is down
 auto tun6to4
 iface tun6to4 inet6 v4tunnel
 	address $WAN6IP
