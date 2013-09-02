@@ -19,6 +19,8 @@ done
 shift $(expr $OPTIND - 1)
 
 ar7flashtools () {
+	mkdir -p tools
+
 	[ -x tools/srec2bin ] \
 		|| gcc -o tools/srec2bin src/openwrt/tools/firmware-utils/src/srec2bin.c
 	[ -x tools/addpattern ] \
@@ -61,8 +63,117 @@ buildroot () {
 	rsync -rl src/buildroot/output/target/ rootfs
 }
 
+hostname () {
+	echo -n $HOSTNAME > rootfs/etc/hostname
+
+	cat <<EOF > rootfs/etc/hosts
+127.0.0.1       localhost
+127.1.0.1       $HOSTNAME.$DOMAIN $HOSTNAME
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+EOF
+}
+
+interfaces () {
+	cat <<EOF > rootfs/etc/network/interfaces
+# Configure Loopback
+auto lo
+iface lo inet loopback
+	up	modprobe ipv6
+
+	up	sysctl -q -w net.ipv4.conf.default.rp_filter=1
+	up	sysctl -q -w net.ipv4.conf.all.rp_filter=1
+	up	sysctl -q -w net.ipv4.conf.lo.rp_filter=1
+
+	up	sysctl -q -w net.ipv4.conf.default.forwarding=1
+	up	sysctl -q -w net.ipv4.conf.all.forwarding=1
+	up	sysctl -q -w net.ipv4.ip_forward=1
+
+	up	iptables-restore  < /etc/network/iptables.active
+
+	up	sysctl -q -w net.netfilter.nf_conntrack_max=4096
+
+	# bogons (rfc6890)
+	up	ip route add unreachable 10.0.0.0/8
+	up	ip route add unreachable 100.64.0.0/10
+	up	ip route add unreachable 169.254.0.0/16
+	up	ip route add unreachable 172.16.0.0/12
+	up	ip route add unreachable 192.0.0.0/24
+	up	ip route add unreachable 192.0.2.0/24
+	up	ip route add unreachable 192.88.99.0/24
+	up	ip route add unreachable 192.168.0.0/16
+	up	ip route add unreachable 198.18.0.0/15
+	up	ip route add unreachable 198.51.100.0/24
+	up	ip route add unreachable 203.0.113.0/24
+	up	ip route add unreachable 240.0.0.0/4
+iface lo inet6 static
+	address	$WAN6NT::
+	netmask	64
+
+	up	sysctl -q -w net.ipv6.conf.default.forwarding=1
+	up	sysctl -q -w net.ipv6.conf.all.forwarding=1
+
+	up	sysctl -q -w net.ipv6.conf.default.autoconf=0
+	up	sysctl -q -w net.ipv6.conf.all.autoconf=0
+
+	# bogons (rfc6890)
+	up	ip route add unreachable 64:ff9b::/96
+	up	ip route add unreachable ::ffff:0:0/96
+	up	ip route add unreachable 100::/64
+	up	ip route add unreachable 2001::/23
+	up	ip route add unreachable 2001:2::/48
+	up	ip route add unreachable 2001:db8::/32
+	up	ip route add unreachable 2001:10::/28
+	up	ip route add unreachable 2002::/16
+	up	ip route add unreachable fc00::/7
+
+	up	ip6tables-restore < /etc/network/ip6tables.active
+
+auto eth0
+iface eth0 inet static
+	pre-up	modprobe cpmac
+	address	$LAN4IP
+	netmask	$LAN4SN
+iface eth0 inet6 static
+	address	$WAN6NT:$LAN6NT::
+	netmask	64
+EOF
+
+	if [ "$WAN6IP" != "${WAN6IP#2002:}" ]; then
+		cat <<EOF >> rootfs/etc/network/interfaces
+
+# 6to4 destination optimisation
+auto tun6to4
+iface tun6to4 inet6 v4tunnel
+	address $WAN6IP
+	netmask 16
+	gateway ::192.88.99.1
+	endpoint any
+	local $WAN4IP
+EOF
+	fi
+}
+
+ppp () {
+	:
+	# fixups for real
+	#up	ip route delete unreachable 2002::/16
+	#up	ip route add 2001::/32 dev ppp0
+	# fixups for tunnelled
+	#up	ip route delete unreachable 192.88.99.0/24
+	#up	ip route add 2001::/32 dev tun6to4
+}
+
 customise () {
 	rsync -rl overlay/ rootfs
+
+	hostname
+	interfaces
 
 	find rootfs -type f -name .empty -delete
 
@@ -165,14 +276,14 @@ EOF
 	( dd if=/dev/zero bs=16 count=1; dd if=vmlinuz.bin bs=786432 conv=sync; cat fs.img ) | tools/addpattern -o firmware-code.bin -p WA21
 }
 
+. ./local
+
 git submodule init
 git submodule update
 
 BASEDIR="$(pwd)"
 
 #VERSION_OPENWRT=$(git --git-dir=src/openwrt/.git rev-parse HEAD | cut -c 1-8)
-
-mkdir -p tools
 
 ar7flashtools
 
