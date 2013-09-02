@@ -276,14 +276,17 @@ EOF
 	( dd if=/dev/zero bs=16 count=1; dd if=vmlinuz.bin bs=786432 conv=sync; cat fs.img ) | tools/addpattern -o firmware-code.bin -p WA21
 }
 
-. ./local
+if [ -f local ]; then
+	. ./local
+else
+	echo missing 'local' config file >&2
+	exit 1
+fi
 
 git submodule init
 git submodule update
 
 BASEDIR="$(pwd)"
-
-#VERSION_OPENWRT=$(git --git-dir=src/openwrt/.git rev-parse HEAD | cut -c 1-8)
 
 ar7flashtools
 
@@ -302,6 +305,8 @@ customise
 
 bake
 
-#echo -e "mode binary\nconnect 192.168.0.1\nput firmware-code.bin" | tftp
+echo
+echo "your firmware is now ready to deploy, do this by typing:"
+echo "echo -e \"mode binary\\\nconnect $LAN4IP\\\nput firmware-code.bin\" | tftp"
 
 exit 0
