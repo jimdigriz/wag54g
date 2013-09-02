@@ -10,7 +10,7 @@ exec </dev/$DEV >/dev/$DEV 2>&1
 #reset
 stty sane; stty ispeed $BAUD; stty ospeed $BAUD
 
-printf "%s login: " "`hostname`"
+printf "%s login: " "$(hostname)"
 read -r login
 
-exec /bin/login "$login"
+exec setsid sh -c "exec /bin/login '$login' </dev/$DEV >/dev/$DEV 2>&1"
