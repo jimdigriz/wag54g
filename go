@@ -147,7 +147,7 @@ EOF
 	if [ "$WAN6IP" != "${WAN6IP#2002:}" ]; then
 		cat <<EOF >> rootfs/etc/network/interfaces
 
-# FIXME: we do not get unreachable whilst WAN is down
+# FIXME: we do not get unreachable here
 auto tun6to4
 iface tun6to4 inet6 v4tunnel
 	address $WAN6IP
