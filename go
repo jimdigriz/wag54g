@@ -2,22 +2,6 @@
 
 set -eu
 
-PPPOE=
-USAGE="Usage: $(basename $0) [OPTION]
-
-  -e                   enable PPP-over-Ethernet support
-  -h                   display this help and exit
-"
-
-while getopts eh f
-do
-	case $f in
-	e)	PPPOE=$f;;
-	h | \?)	echo "$USAGE"; [ $f = 'h' ] && exit 0 || exit 1;;
-	esac
-done
-shift $(expr $OPTIND - 1)
-
 ar7flashtools () {
 	mkdir -p toolst
 
@@ -28,24 +12,10 @@ ar7flashtools () {
 }
 
 patches () {
-	mkdir -p patches/linux
+	mkdir -p src/patches/linux
 
-	#alex@berk:/usr/src/wag54g/wag54g$ find src/openwrt/target/linux/ar7 -name '*.patch'
-	#src/openwrt/target/linux/ar7/patches-3.9/110-flash.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/120-gpio_chrdev.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/160-vlynq_try_remote_first.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/200-free-mem-below-kernel-offset.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/300-add-ac49x-platform.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/310-ac49x-prom-support.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/320-ac49x-mtd-partitions.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/500-serial_kludge.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/920-ar7part.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/925-actiontec_leds.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/950-cpmac_titan.patch
-	#src/openwrt/target/linux/ar7/patches-3.9/972-cpmac_fixup.patch
-
-	ln -s -f -T ../cmdline-parts.patch patches/linux/linux-digriz.500-cmdline-parts.patch
-	#ln -s -f -T ../../src/openwrt/target/linux/ar7/patches-3.9/500-serial_kludge.patch patches/linux/linux-openwrt.500-serial-kludge.patch
+	ln -s -f $(pwd)/patches/cmdline-parts.patch src/patches/linux/linux-digriz.500-cmdline-parts.patch
+	ln -s -f $(pwd)/src/openwrt/target/linux/ar7/patches-3.9/500-serial_kludge.patch src/patches/linux/linux-openwrt.500-serial-kludge.patch
 }
 
 buildroot () {
@@ -290,7 +260,7 @@ BASEDIR="$(pwd)"
 
 ar7flashtools
 
-#patches
+patches
 
 buildroot
 
@@ -298,7 +268,7 @@ eval $(grep BR2_LINUX_KERNEL_VERSION src/buildroot/.config)
 export KERNELDIR="$BASEDIR/src/buildroot/output/build/linux-$BR2_LINUX_KERNEL_VERSION"
 export CROSS_COMPILE="$BASEDIR/src/buildroot/output/host/usr/bin/mipsel-linux-"
 
-[ "$PPPOE" ] && pppoe
+[ "$TYPE" = "PPPoE" ] && pppoe
 sangam
 
 customise
