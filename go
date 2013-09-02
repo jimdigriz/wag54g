@@ -3,7 +3,7 @@
 set -eu
 
 ar7flashtools () {
-	mkdir -p toolst
+	mkdir -p tools
 
 	[ -x tools/srec2bin ] \
 		|| gcc -o tools/srec2bin src/openwrt/tools/firmware-utils/src/srec2bin.c
