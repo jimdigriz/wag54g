@@ -120,7 +120,7 @@ customise () {
 	rsync -rl overlay/ rootfs
 
 	echo -n $HOSTNAME > rootfs/etc/hostname
-	sed -i "s/%HOSTNAME%/$HOSTNAME/g s/%DOMAIN%/$DOMAIN/" rootfs/etc/hosts
+	sed -i "s/%HOSTNAME%/$HOSTNAME/g; s/%DOMAIN%/$DOMAIN/" rootfs/etc/hosts
 
 	interfaces
 
