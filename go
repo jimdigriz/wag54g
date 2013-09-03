@@ -160,8 +160,9 @@ customise () {
 	find rootfs/lib rootfs/usr/lib -type f \( -name '*.a' -o -name '*.la' \) -delete
 
 	# sstrip everything that remains
-	find rootfs/usr rootfs/bin rootfs/lib -type f \
+	find rootfs/bin rootfs/sbin rootfs/lib rootfs/usr -type f \
 		| grep -v '\.\(ko\|bin\)$' \
+		| grep -v -e routef -e routel -e rtpr \
 		| xargs -n1 src/buildroot/output/host/usr/bin/mipsel-linux-sstrip
 }
 
