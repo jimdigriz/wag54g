@@ -126,6 +126,14 @@ customise () {
 
 	sed -i "s/%NTP%/$NTP/" rootfs/etc/sv/ntpd/run
 
+	sed -i "s/%USER%/$USER/; s/%PASS%/$PASS/" rootfs/etc/ppp/options
+	if [ "$TYPE" = "PPPoE" ]; then
+		echo plugin rp-pppoe.so nas0 >> rootfs/etc/ppp/options
+	else
+		echo plugin pppoatm.so $VPI.$VCI >> rootfs/etc/ppp/options
+	fi
+	[ "$WAN6IP" = "${WAN6IP#2002:}" ] && echo +ipv6 >> rootfs/etc/ppp/options
+
 	find rootfs -type f -name .empty -delete
 
 	rm rootfs/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
@@ -259,6 +267,8 @@ LAN6NT=1000
 
 # 'PPPoE' or 'PPPoA'
 TYPE=PPPoA
+VPI=0
+VCI=38
 USER=username
 PASS=password
 

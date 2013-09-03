@@ -1,0 +1,16 @@
+#debug
+lock
+defaultroute
+usepeerdns
+persist
+holdoff 10
+updetach
+noipdefault
+noauth
+crtscts
+maxfail 0
+lcp-max-configure 3
+lcp-echo-failure 3
+lcp-echo-interval 3
+name %USER%
+password %PASS%
