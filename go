@@ -94,7 +94,6 @@ EOF
 	if [ "$WAN6IP" != "${WAN6IP#2002:}" ]; then
 		cat <<EOF >> rootfs/etc/network/interfaces
 
-# FIXME: we do not get unreachable here
 auto tun6to4
 iface tun6to4 inet6 v4tunnel
 	address $WAN6IP
@@ -104,16 +103,6 @@ iface tun6to4 inet6 v4tunnel
 	local $WAN4IP
 EOF
 	fi
-}
-
-ppp () {
-	:
-	# fixups for real
-	#up	ip route delete unreachable 2002::/16
-	#up	ip route add 2001::/32 dev ppp0
-	# fixups for tunnelled
-	#up	ip route delete unreachable 192.88.99.0/24
-	#up	ip route add 2001::/32 dev tun6to4
 }
 
 customise () {
