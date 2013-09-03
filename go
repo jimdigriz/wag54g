@@ -190,6 +190,7 @@ sangam () {
 	tar -xC src -f src/sangam_atm-D7.05.01.00-R1.tar.bz2
 
 	find src/openwrt/package/kernel/ar7-atm/patches-D7.05.01.00 -type f -name '*.patch' \
+		| sort \
 		| xargs -I{} sh -c "patch -p1 -f -d src/sangam_atm-D7.05.01.00 < '{}'"
 
 	patch -p1 -f -d src/sangam_atm-D7.05.01.00 < patches/sangam_atm.patch
