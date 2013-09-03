@@ -193,8 +193,6 @@ pppoe () {
 
 	tar -xC src -f src/linux-atm-2.5.2.tar.gz
 
-	OLDPWD="$(pwd)"
-
 	cd src/linux-atm-2.5.2
 
 	./configure --prefix="$BASEDIR/rootfs" --with-kernel-headers=$KERNELDIR/include --host=mipsel-linux
