@@ -26,22 +26,6 @@ buildroot () {
 	rsync -rl src/buildroot/output/target/ rootfs
 }
 
-hostname () {
-	echo -n $HOSTNAME > rootfs/etc/hostname
-
-	cat <<EOF > rootfs/etc/hosts
-127.0.0.1       localhost
-127.1.0.1       $HOSTNAME.$DOMAIN $HOSTNAME
-
-# The following lines are desirable for IPv6 capable hosts
-::1     ip6-localhost ip6-loopback
-fe00::0 ip6-localnet
-ff00::0 ip6-mcastprefix
-ff02::1 ip6-allnodes
-ff02::2 ip6-allrouters
-EOF
-}
-
 interfaces () {
 	cat <<EOF > rootfs/etc/network/interfaces
 # Configure Loopback
@@ -135,8 +119,12 @@ ppp () {
 customise () {
 	rsync -rl overlay/ rootfs
 
-	hostname
+	echo -n $HOSTNAME > rootfs/etc/hostname
+	sed -i "s/%HOSTNAME%/$HOSTNAME/g s/%DOMAIN%/$DOMAIN/" rootfs/etc/hosts
+
 	interfaces
+
+	sed -i "s/%NTP%/$NTP/" rootfs/etc/sv/ntpd/run
 
 	find rootfs -type f -name .empty -delete
 
@@ -273,6 +261,8 @@ LAN6NT=1000
 TYPE=PPPoA
 USER=username
 PASS=password
+
+NTP=pool.ntp.org
 EOF
 	exit 1
 fi
