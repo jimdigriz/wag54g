@@ -157,9 +157,11 @@ customise () {
 
 	cp -a src/buildroot/output/host/usr/mipsel-buildroot-linux-uclibc/lib/libgcc_s.so* rootfs/lib
 
+	find rootfs/lib rootfs/usr/lib -type f \( -name '*.a' -o -name '*.la' \) -delete
+
 	# sstrip everything that remains
 	find rootfs/usr rootfs/bin rootfs/lib -type f \
-		| grep -v '\.\(ko\|la\|a\|bin\)$' \
+		| grep -v '\.\(ko\|bin\)$' \
 		| xargs -n1 src/buildroot/output/host/usr/bin/mipsel-linux-sstrip
 }
 
