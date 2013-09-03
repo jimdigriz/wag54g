@@ -191,10 +191,12 @@ pppoe () {
 
 	wget -P src -N --content-disposition http://sourceforge.net/projects/linux-atm/files/latest/download
 
+	rm -rf src/linux-atm-2.5.2
 	tar -xC src -f src/linux-atm-2.5.2.tar.gz
 
 	cd src/linux-atm-2.5.2
 
+	CC="$BASEDIR/src/buildroot/output/host/usr/bin/mipsel-linux-gcc" \
 	./configure --prefix="$BASEDIR/rootfs" --with-kernel-headers=$KERNELDIR/include --host=mipsel-linux
 	make -C src/lib install
 	make -C src/br2684 install
