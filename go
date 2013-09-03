@@ -249,7 +249,32 @@ EOF
 if [ -f local ]; then
 	. ./local
 else
-	echo missing 'local' config file >&2
+	echo missing 'local' config file, default created, please edit >&2
+	cat <<'EOF' > local
+HOSTNAME=host
+DOMAIN=example.com
+
+LAN4IP=192.168.1.1
+LAN4SN=255.255.255.0
+
+WAN4IP=203.0.113.1
+# put here your /48 IPv6 allocation if you have one,
+# like "WAN6NT=2001:db8:beef", otherwise leave blank
+WAN6NT=
+
+if [ ! "$WAN6NT" ]; then
+	WAN6NT=$(echo $WAN4IP | tr . ' ' | xargs printf '2002:%.2x%.2x:%.2x%.2x')
+fi
+
+WAN6IP=$WAN6NT::
+# LAN IPv6 subnet to use (WAN6NT:LAN6NT::/64)
+LAN6NT=1000
+
+# 'PPPoE' or 'PPPoA'
+TYPE=PPPoA
+USER=username
+PASS=password
+EOF
 	exit 1
 fi
 
