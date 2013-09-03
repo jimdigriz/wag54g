@@ -171,7 +171,11 @@ customise () {
 	rm -f rootfs/usr/lib/tc/*.dist
 
 	cp -a src/buildroot/output/host/usr/mipsel-buildroot-linux-uclibc/lib/libgcc_s.so* rootfs/lib
-	./src/buildroot/output/host/usr/bin/mipsel-linux-sstrip rootfs/lib/libgcc_s.so.1
+
+	# sstrip everything that remains
+	find rootfs/usr rootfs/bin rootfs/lib -type f \
+		| grep -v '\.\(ko\|la\|a\|bin\)$' \
+		| xargs -n1 src/buildroot/output/host/usr/bin/mipsel-linux-sstrip
 }
 
 sangam () {
