@@ -11,13 +11,6 @@ ar7flashtools () {
 		|| gcc -o tools/addpattern src/openwrt/tools/firmware-utils/src/addpattern.c
 }
 
-patches () {
-	mkdir -p src/patches/linux
-
-	ln -s -f $(pwd)/patches/cmdline-parts.patch src/patches/linux/linux-digriz.500-cmdline-parts.patch
-	ln -s -f $(pwd)/src/openwrt/target/linux/ar7/patches-3.9/500-serial_kludge.patch src/patches/linux/linux-openwrt.500-serial-kludge.patch
-}
-
 buildroot () {
 	ln -s -f -T ../../config/buildroot.config src/buildroot/.config
 
@@ -286,8 +279,6 @@ git submodule update
 BASEDIR="$(pwd)"
 
 ar7flashtools
-
-patches
 
 buildroot
 

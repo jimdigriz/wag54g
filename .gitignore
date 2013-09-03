@@ -3,7 +3,6 @@
 !.gitmodules
 
 local
-src/patches
 src/sangam_atm*
 src/linux-atm*
 dl
