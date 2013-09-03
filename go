@@ -157,24 +157,25 @@ customise () {
 	sed -i -e 's/^devpts/#devpts/' rootfs/etc/fstab
 
 	# misc unneeded bits
-        rm -rf rootfs/home/ftp
-        rm -rf rootfs/var/lib
-        rm -rf rootfs/var/pcmcia
-        rm -rf rootfs/usr/share/udhcpc
-        rm -rf rootfs/share/man
+	rm -rf rootfs/home/ftp
+	rm -rf rootfs/var/lib
+	rm -rf rootfs/var/pcmcia
+	rm -rf rootfs/usr/share/udhcpc
+	rm -rf rootfs/share/man
 
-        rm -f rootfs/usr/sbin/pppdump
-        rm -f rootfs/usr/sbin/pppstats
-        rm -f rootfs/usr/sbin/chat
+	rm -f rootfs/usr/sbin/pppdump
+	rm -f rootfs/usr/sbin/pppstats
+	rm -f rootfs/usr/sbin/chat
 
-        DELETE="minconn passprompt passwordfd winbind openl2tp pppol2tp"
-        for D in $DELETE; do
-                rm -f rootfs/usr/lib/pppd/2.4.5/$D.so
-        done
+	DELETE="minconn passprompt passwordfd winbind openl2tp pppol2tp"
+	for D in $DELETE; do
+		rm -f rootfs/usr/lib/pppd/2.4.5/$D.so
+	done
 
-        rm -f rootfs/lib/modules/*/source
-        rm -f rootfs/lib/modules/*/build
-        rm -f rootfs/lib/modules/*/modules.*
+	rm -f rootfs/lib/modules/*/source
+	rm -f rootfs/lib/modules/*/build
+	rm -f rootfs/lib/modules/*/modules.*
+	rm -f rootfs/usr/lib/tc/*.dist
 
 	cp -a src/buildroot/output/host/usr/mipsel-buildroot-linux-uclibc/lib/libgcc_s.so* rootfs/lib
 	./src/buildroot/output/host/usr/bin/mipsel-linux-sstrip rootfs/lib/libgcc_s.so.1
