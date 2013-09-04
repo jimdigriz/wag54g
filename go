@@ -79,6 +79,9 @@ iface lo inet6 static
 	up	ip route add unreachable 2002::/16
 	up	ip route add unreachable fc00::/7
 
+	# blackhole our allocation to prevent loops
+	up	ip route add unreachable $WAN6NT::/48
+
 	up	ip6tables-restore < /etc/network/ip6tables.active
 
 auto eth0
