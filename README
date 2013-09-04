@@ -3,4 +3,6 @@ Buildroot Linux on a Linksys WAG54Gv2
 http://www.digriz.org.uk/wag54g
 
 To run:
- sh -x go
+$ git clone https://github.com/jimdigriz/wag54g.git
+$ cd wag54g
+$ sh -x go
