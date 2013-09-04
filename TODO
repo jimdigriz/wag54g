@@ -4,3 +4,4 @@
 * configure dnsmasq
 * firewall (inc TCPMSS bits)
 * QoS and add de-bufferbloat bits
+* ADSL logging (the PPP bit) via runit->syslog
