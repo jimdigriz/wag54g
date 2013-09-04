@@ -91,6 +91,17 @@ iface eth0 inet6 static
 	netmask	64
 EOF
 
+	if [ "$TYPE" = "PPPoE" ]; then
+		cat <<EOF >> rootfs/etc/network/interfaces
+
+iface nas0 inet manual
+	pre-up	br2684ctl -c 0 -a $VPI.$VCI -e $ENCAP -b
+	up	echo 3 > /sys/class/net/nas0/tx_queue_len
+	up	ip link set dev nas0 up
+	down	pkill br2684ctl
+EOF
+fi
+
 	if [ "$WAN6IP" != "${WAN6IP#2002:}" ]; then
 		cat <<EOF >> rootfs/etc/network/interfaces
 
@@ -259,6 +270,8 @@ LAN6NT=1000
 
 # 'PPPoE' or 'PPPoA'
 TYPE=PPPoA
+# 'LLC' or 'VCmux'
+METHOD=LLC
 VPI=0
 VCI=38
 USER=username
@@ -268,6 +281,8 @@ NTP=pool.ntp.org
 EOF
 	exit 1
 fi
+
+[ "$METHOD" = "LLC" ] && ENCAP=0 || ENCAP=1
 
 git submodule init
 git submodule update

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -eu
+
+exec 2>&1
+
+pkill pppd	|| true
+ifdown nas0	|| true

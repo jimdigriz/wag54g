@@ -1,10 +1,10 @@
-#debug
+nodetach
+debug
 lock
 defaultroute
 usepeerdns
 persist
 holdoff 10
-updetach
 noipdefault
 noauth
 crtscts

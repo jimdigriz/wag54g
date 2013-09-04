@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -eu
+
+exec 2>&1
+
+modprobe tiatm
+
+I=0
+while true; do
+	grep -q SHOWTIME /proc/avalanche/avsar_modem_training && break
+
+	if [ $I -eq 120 ]; then
+		echo ADSL did not sync >&2
+		exit 1
+	fi
+
+	sleep 1
+
+	I=$((I+1))
+done
+
+if grep -q rp-pppoe /etc/ppp/options; then
+	ifup nas0
+
+	modprobe pppoe
+else
+	modprobe pppoatm
+fi
+
+exec pppd
+
+# the pppd option 'updetach' stops the IPv6 default route being added
+pre-up    ip route add ::/0 dev ppp0
+# http://www.linuxhowtos.org/manpages/8/tc-stab.htm - PPPoE VC-Mux -> 32
+pre-up    MTU=$(cat /sys/class/net/ppp0/mtu); ip link set ppp0 mtu $(($MTU-($MTU-32) % 48))
+post-down pkill pppd
