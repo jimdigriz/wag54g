@@ -96,7 +96,6 @@ EOF
 
 iface nas0 inet manual
 	pre-up	br2684ctl -c 0 -a $VPI.$VCI -e $ENCAP -b
-	up	echo 3 > /sys/class/net/nas0/tx_queue_len
 	up	ip link set dev nas0 up
 	down	pkill br2684ctl
 EOF

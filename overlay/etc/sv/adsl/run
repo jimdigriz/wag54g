@@ -29,9 +29,3 @@ else
 fi
 
 exec pppd
-
-# the pppd option 'updetach' stops the IPv6 default route being added
-pre-up    ip route add ::/0 dev ppp0
-# http://www.linuxhowtos.org/manpages/8/tc-stab.htm - PPPoE VC-Mux -> 32
-pre-up    MTU=$(cat /sys/class/net/ppp0/mtu); ip link set ppp0 mtu $(($MTU-($MTU-32) % 48))
-post-down pkill pppd
