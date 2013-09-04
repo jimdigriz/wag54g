@@ -5,21 +5,4 @@
  - for 6to4 add: ip route delete unreachable 192.88.99.0/24
 * remove ugly hack for linux-atm that uses
 	CC="$BASEDIR/src/buildroot/output/host/usr/bin/mipsel-linux-gcc"
-* more work for PPPoE
----------
-iface nas0 inet manual
-        pre-up    br2684ctl -c 0 -a 0.101 -e 0 -b
-        up        echo 3 > /sys/class/net/nas0/tx_queue_len
-        up        ip link set dev nas0 up
-
-auto ppp0
-iface ppp0 inet manual
-        pre-up    for I in $(seq 120); do [ -n "$(grep SHOWTIME /proc/avalanche/avsar_modem_training)" ] && exit 0; sleep 1; done; echo xDSL did not sync 2>&1; exit 1
-        pre-up    [ "$(grep '^plugin .*pppoatm.so' /etc/ppp/options)" ] && modprobe pppoatm || ( modprobe pppoe; ifup nas0 )
-        pre-up    pppd
-        # the pppd option 'updetach' stops the IPv6 default route being added
-        pre-up    ip route add ::/0 dev ppp0
-        # http://www.linuxhowtos.org/manpages/8/tc-stab.htm - PPPoE VC-Mux -> 32
-        pre-up    MTU=$(cat /sys/class/net/ppp0/mtu); ip link set ppp0 mtu $(($MTU-($MTU-32) % 48))
-        post-down pkill pppd
-------
+* add de-bufferbloat bits
