@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -eu
+
+if grep -q defaultroute /etc/ppp/options; then
+	ip -6 route add default via $LLREMOTE dev $IFNAME
+fi
+
+exit 0
