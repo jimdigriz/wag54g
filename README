@@ -1,0 +1,6 @@
+Buildroot Linux on a Linksys WAG54Gv2
+
+http://www.digriz.org.uk/wag54g
+
+To run:
+ sh -x go
