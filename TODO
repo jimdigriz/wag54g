@@ -1,5 +1,6 @@
 * remove ugly hack for linux-atm that uses
 	CC="$BASEDIR/src/buildroot/output/host/usr/bin/mipsel-linux-gcc"
-* add de-bufferbloat bits
 * user accounts for dropbear
 * configure dnsmasq
+* firewall (inc TCPMSS bits)
+* QoS and add de-bufferbloat bits

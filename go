@@ -143,6 +143,8 @@ customise () {
 	fi
 	[ "$WAN6IP" = "${WAN6IP#2002:}" ] && echo +ipv6 >> rootfs/etc/ppp/options
 
+	sed -i "s/%WAN4IP%/$WAN4IP/" rootfs/etc/network/iptables.active
+
 	find rootfs -type f -name .empty -delete
 
 	rm rootfs/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
