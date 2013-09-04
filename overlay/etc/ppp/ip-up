@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -eu
+
+if grep -q defaultroute /etc/ppp/options; then
+	if ! grep -q ipv6 /etc/ppp/options ]; then
+		ifup tun6to4
+
+		# make Teredo destinations routable
+		ip route add 2001::/32 dev tun6to4
+	fi
+fi
+
+exit 0

@@ -1,8 +1,5 @@
-* or 6to4 users, when WAN is down, no unreachables are generated
-* bogon adjustments:
- - always add: ip route add 2001::/32 dev {ppp0|tun6to4}
- - for native v6 add: ip route delete unreachable 2002::/16
- - for 6to4 add: ip route delete unreachable 192.88.99.0/24
 * remove ugly hack for linux-atm that uses
 	CC="$BASEDIR/src/buildroot/output/host/usr/bin/mipsel-linux-gcc"
 * add de-bufferbloat bits
+* user accounts for dropbear
+* configure dnsmasq

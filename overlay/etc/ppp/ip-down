@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -eu
+
+if grep -q defaultroute /etc/ppp/options; then
+        [ grep -q ipv6 /etc/ppp/options ] || ifdown tun6to4
+fi
+
+exit 0

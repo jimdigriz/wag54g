@@ -3,7 +3,10 @@
 set -eu
 
 if grep -q defaultroute /etc/ppp/options; then
-	ip -6 route add default via $LLREMOTE dev $IFNAME
+	ip route add ::/0 via $LLREMOTE dev $IFNAME
+
+	# make Teredo destinations routable
+	ip route add 2001::/32 via $LLREMOTE dev $IFNAME
 fi
 
 exit 0
