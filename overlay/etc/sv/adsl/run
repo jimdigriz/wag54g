@@ -10,10 +10,7 @@ I=0
 while true; do
 	grep -q SHOWTIME /proc/avalanche/avsar_modem_training && break
 
-	if [ $I -eq 120 ]; then
-		echo ADSL did not sync >&2
-		exit 1
-	fi
+	[ $I -eq 120 ] && echo no sync after 120s, retrying silently >&2
 
 	sleep 1
 
