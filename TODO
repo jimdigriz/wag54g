@@ -1,7 +1,10 @@
 * remove ugly hack for linux-atm that uses
 	CC="$BASEDIR/src/buildroot/output/host/usr/bin/mipsel-linux-gcc"
 * user accounts for dropbear
-* configure dnsmasq
+* dnsmasq fixes
+ - "domain=%DOMAIN%,%LAN4IP%/24,local"
+  - assumes /24
+  - using LAN4IP seems messy, although it works
+ - figure out auto DHCP range choosing, less user config
 * firewall (inc TCPMSS bits)
 * QoS and add de-bufferbloat bits
-* ADSL logging (the PPP bit) via runit->syslog

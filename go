@@ -145,6 +145,11 @@ customise () {
 
 	sed -i "s/%WAN4IP%/$WAN4IP/" rootfs/etc/network/iptables.active
 
+	sed -i "s/%DHCPS%/$DHCPS/; \
+			s/%DHCPF%/$DHCPF/; \
+			s/%DOMAIN%/$DOMAIN/; \
+			s/%LAN4IP%/$LAN4IP/" rootfs/etc/sv/dnsmasq/run
+
 	find rootfs -type f -name .empty -delete
 
 	rm rootfs/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
@@ -289,6 +294,8 @@ USER=username
 PASS=password
 
 NTP=pool.ntp.org
+DHCPS=192.168.1.32
+DHCPF=192.168.1.63
 EOF
 	exit 1
 fi

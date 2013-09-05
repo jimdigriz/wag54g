@@ -3,4 +3,18 @@
 set -eu
 
 exec 2>&1
-exec /usr/sbin/dnsmasq -k
+exec /usr/sbin/dnsmasq \
+	--keep-in-foreground \
+	--interface eth0 \
+	--no-dhcp-interface ppp0 \
+	--bind-interfaces \
+	--bogus-priv \
+	--resolv-file=/etc/ppp/resolv.conf \
+	--stop-dns-rebind \
+	--rebind-localhost-ok \
+	--domain-needed \
+	--dhcp-range=%DHCPS%,%DHCPF%,12h \
+	--dhcp-range=::,static,constructor:eth0 \
+	--dhcp-authoritative \
+	--leasefile-ro \
+	--domain=%DOMAIN%,%LAN4IP%/24,local
