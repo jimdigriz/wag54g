@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eu
+
+RUNAS=nobody
+
+exec chpst -u $RUNAS logger -t adsl

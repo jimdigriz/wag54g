@@ -3,4 +3,4 @@
 set -eu
 
 exec 2>&1
-exec /sbin/syslogd -n -m 0
+exec /sbin/syslogd -n -m 0 -D -K
