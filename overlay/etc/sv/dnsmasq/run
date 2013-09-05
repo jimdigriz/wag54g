@@ -6,7 +6,7 @@ exec 2>&1
 exec /usr/sbin/dnsmasq \
 	--keep-in-foreground \
 	--interface eth0 \
-	--no-dhcp-interface ppp0 \
+	--auth-server=%DOMAIN%,ppp0 \
 	--bind-interfaces \
 	--bogus-priv \
 	--resolv-file=/etc/ppp/resolv.conf \
