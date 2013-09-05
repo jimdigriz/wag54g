@@ -13,8 +13,9 @@ exec /usr/sbin/dnsmasq \
 	--stop-dns-rebind \
 	--rebind-localhost-ok \
 	--domain-needed \
-	--dhcp-range=%DHCPS%,%DHCPF%,12h \
-	--dhcp-range=::,static,constructor:eth0 \
+	--dhcp-range=%DHCPS%,%DHCPF%,48h \
+	--dhcp-range=%WAN6NT%:%LAN6NT%::,ra-stateless,ra-names \
 	--dhcp-authoritative \
-	--leasefile-ro \
-	--domain=%DOMAIN%,%LAN4IP%/24,local
+	--dhcp-leasefile=/var/run/dnsmasq.leases \
+	--domain=%DOMAIN%,%LAN4IP%/24,local \
+	--enable-ra

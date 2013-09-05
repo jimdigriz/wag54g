@@ -1,0 +1,22 @@
+From: Simon Kelley <simon@thekelleys.org.uk>
+Date: Fri, 17 May 2013 10:32:03 +0000 (+0100)
+Subject: Fix failure to start with ENOTSOCK
+X-Git-Tag: v2.67test5~2
+X-Git-Url: http://thekelleys.org.uk/gitweb/?p=dnsmasq.git;a=commitdiff_plain;h=cfcad42ff1ddee8e64d120f18016a654152d0215
+
+Fix failure to start with ENOTSOCK
+---
+
+diff --git a/src/dnsmasq.c b/src/dnsmasq.c
+index 43b8cb1..b0f984d 100644
+--- a/src/dnsmasq.c
++++ b/src/dnsmasq.c
+@@ -248,7 +248,7 @@ int main (int argc, char **argv)
+ #endif
+ 
+ #if defined(HAVE_LINUX_NETWORK) && defined(HAVE_DHCP6)
+-      if (daemon->dhcp6)
++      if (daemon->doing_dhcp6)
+ 	bindtodevice(daemon->dhcp6fd);
+ #endif
+     }

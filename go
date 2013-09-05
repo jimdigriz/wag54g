@@ -147,6 +147,8 @@ customise () {
 
 	sed -i "s/%DHCPS%/$DHCPS/; \
 			s/%DHCPF%/$DHCPF/; \
+			s/%WAN6NT%/$WAN6NT/; \
+			s/%LAN6NT%/$LAN6NT/; \
 			s/%DOMAIN%/$DOMAIN/; \
 			s/%LAN4IP%/$LAN4IP/" rootfs/etc/sv/dnsmasq/run
 
