@@ -65,7 +65,7 @@ iface lo inet loopback
 	up	ip route add unreachable 198.18.0.0/15
 	up	ip route add unreachable 198.51.100.0/24
 	up	ip route add unreachable 203.0.113.0/24
-	up	ip route add unreachable 240.0.0.0/4
+	up	ip route add blackhole 240.0.0.0/4
 iface lo inet6 static
 	address	$WAN6NT::
 	netmask	64
