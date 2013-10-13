@@ -5,4 +5,8 @@ http://www.digriz.org.uk/wag54g
 To run:
 $ git clone https://github.com/jimdigriz/wag54g.git
 $ cd wag54g
-$ sh -x go
+$ ./go
+
+On the first run the software will grumble that you do not have a configuration file and it will generate one for you. You should look at the file create local and amend it to your own needs. You will also need to create some account files, these have the name ssh.USERNAME and simply contain what you would normally expect in your ~/.ssh/authorized_keys file.
+
+Once you have created at least one ssh.USERNAME file and amended the local configuration file, then just run go again. After an hour, you should have a firmware ready to use. 
