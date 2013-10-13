@@ -2,6 +2,56 @@
 :INPUT ACCEPT [0:0]
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
+:ssh - [0:0]
+
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -m state --state INVALID,UNTRACKED -j DROP
+
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -p igmp -j ACCEPT
+-A INPUT -p ipv6 -j ACCEPT
+
+# accept all traffic from LAN
+-A INPUT -i eth0 -j ACCEPT
+
+# ssh
+-A INPUT -p tcp --dport 22 --syn -j ssh
+# ntp
+-A INPUT -p udp --dport 123 -j REJECT --reject-with icmp-port-unreachable
+
+# dnsmasq authoritive
+-A INPUT -p udp --dport 53 -j ACCEPT
+-A INPUT -p tcp --dport 53 -j ACCEPT
+
+# traceroute
+-A INPUT -p udp --sport 1024: --dport 33434:33689 -m hl --hl-eq 1 -j ACCEPT
+
+# ident speed up and removing of log noise
+-A INPUT -p tcp --dport 113 -j REJECT --reject-with tcp-reset
+
+# noise filtering
+-A INPUT -p tcp -m multiport --dports 23,135,137:139,445,1080,1433,3389,8080 -j DROP
+-A INPUT -p udp -m multiport --dports 135,137:139 -j DROP
+
+-A INPUT        -m hashlimit --hashlimit-name log-ipv4    --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-upto 3/hour -j LOG
+-A INPUT -p tcp -m hashlimit --hashlimit-name reject-ipv4 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-upto 10/min -j REJECT --reject-with tcp-reset
+-A INPUT        -m hashlimit --hashlimit-name reject-ipv4 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-upto 10/min -j REJECT --reject-with icmp-admin-prohibited
+
+-A ssh -m recent --name SSH --set
+-A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -m limit -j REJECT --reject-with icmp-admin-prohibited
+-A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -j DROP
+
+COMMIT
+
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+-A FORWARD -o ppp0 -p tcp --syn -j TCPMSS --clamp-mss-to-pmtu
 
 COMMIT
 
