@@ -125,6 +125,39 @@ EOF
 	fi
 }
 
+accounts () {
+	sed -i "/^root:/ s/^root:[^:]*:/root:$ROOTPASSWD:/" rootfs/etc/shadow
+
+	sed -i '/^default:/ d' rootfs/etc/passwd rootfs/etc/group rootfs/etc/shadow
+
+	I=1000
+
+	for ACCT in $(find . -maxdepth 1 -name 'ssh.*' | sort); do
+		N=$(echo "$ACCT" | cut -d. -f3)
+
+		cat <<EOF >> rootfs/etc/passwd
+$N:x:$I:$I::/home/$N:/bin/sh
+EOF
+		cat <<EOF >> rootfs/etc/group
+$N:x:$I:
+EOF
+		cat <<EOF >> rootfs/etc/shadow
+$N:*:::::::
+EOF
+
+		mkdir -p "rootfs/home/$N/.ssh"
+		cat "$ACCT" > "rootfs/home/$N/.ssh/authorized_keys"
+
+		cat <<EOF >> "$DEVTABLE"
+/home/$N			d	0700	$I	$I	-	-	-	-	-
+/home/$N/.ssh			d	0700	$I	$I	-	-	-	-	-
+/home/$N/.ssh/authorized_keys	f	0600	$I	$I	-	-	-	-	-
+EOF
+
+		I=$((I+1))
+	done
+}
+
 customise () {
 	rsync -rl overlay/ rootfs
 
@@ -132,6 +165,7 @@ customise () {
 	sed -i "s/%HOSTNAME%/$HOSTNAME/g; s/%DOMAIN%/$DOMAIN/" rootfs/etc/hosts
 
 	interfaces
+	accounts
 
 	sed -i "s/%NTP%/$NTP/" rootfs/etc/sv/ntpd/run
 
@@ -244,20 +278,11 @@ bake () {
 		exit 1
 	fi
 
-	DEVTABLE=$(mktemp)
-
-	cat <<'EOF' > "$DEVTABLE"
-# <name>	<type>	<mode>	<uid>	<gid>	<major>	<minor>	<start>	<inc>	<count>
-/bin/busybox	f	4755	0	0	-	-	-	-	-
-EOF
-
 	/usr/sbin/mkfs.jffs2 -D "$DEVTABLE" -X zlib -x lzo -x rtime -e 65536 -n -p -t -l -d rootfs --squash -o fs.img
 	if [ $(wc -c fs.img | cut -d' ' -f1) -gt 3211264 ]; then
 		echo filesystem too big
 		exit 1
 	fi
-
-	rm "$DEVTABLE"
 
 	( dd if=/dev/zero bs=16 count=1; dd if=vmlinuz.bin bs=786432 conv=sync; cat fs.img ) | tools/addpattern -o firmware-code.bin -p WA21
 }
@@ -269,6 +294,8 @@ else
 	cat <<'EOF' > local
 HOSTNAME=host
 DOMAIN=example.com
+# generate your hash with 'makepasswd --crypt-md5 --clearfrom=-' (default: changeme)
+ROOTPASSWD='$1$oKPJuaWf$cq4x3Y1lxL39R31y158pT0'
 
 LAN4IP=192.168.1.1
 LAN4SN=255.255.255.0
@@ -302,6 +329,11 @@ EOF
 	exit 1
 fi
 
+if [ -z "$(find . -maxdepth 1 -name 'ssh.*')" ]; then
+	echo missing user accounts, please create some >&2
+	exit 1
+fi
+
 [ "$METHOD" = "LLC" ] && ENCAP=0 || ENCAP=1
 
 git submodule init
@@ -320,9 +352,18 @@ export CROSS_COMPILE="$BASEDIR/src/buildroot/output/host/usr/bin/mipsel-linux-"
 [ "$TYPE" = "PPPoE" ] && pppoe
 sangam
 
+DEVTABLE=$(mktemp)
+
+cat <<'EOF' > "$DEVTABLE"
+# <name>			<type>	<mode>	<uid>	<gid>	<major>	<minor>	<start>	<inc>	<count>
+/bin/busybox			f	4755	0	0	-	-	-	-	-
+EOF
+
 customise
 
 bake
+
+rm "$DEVTABLE"
 
 echo
 echo "your firmware is now ready to deploy, do this by typing:"

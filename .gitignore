@@ -3,6 +3,8 @@
 !.gitmodules
 
 local
+ssh.*
+
 src/sangam_atm*
 src/linux-atm*
 dl
