@@ -336,8 +336,7 @@ fi
 
 [ "$METHOD" = "LLC" ] && ENCAP=0 || ENCAP=1
 
-git submodule init
-git submodule update
+git submodule update --init
 
 BASEDIR="$(pwd)"
 
