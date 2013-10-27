@@ -110,7 +110,6 @@ iface lo inet6 static
 auto eth0
 iface eth0 inet static
 	pre-up	modprobe cpmac
-	pre-up  ethtool --set-ring eth0 rx 128
 	address	$LAN4IP
 	netmask	$LAN4SN
 iface eth0 inet6 static
