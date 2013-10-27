@@ -64,7 +64,7 @@ iface lo inet loopback
 	up	sysctl -q -w net.ipv4.conf.all.forwarding=1
 	up	sysctl -q -w net.ipv4.ip_forward=1
 
-	up	iptables-restore  < /etc/network/iptables.active
+	up	iptables-restore < /etc/network/iptables.active
 
 	up	sysctl -q -w net.netfilter.nf_conntrack_max=4096
 
