@@ -8,8 +8,7 @@
 -A INPUT -m state --state INVALID,UNTRACKED -j DROP
 
 -A INPUT -i lo -j ACCEPT
-# ipv6-icmp
--A INPUT -p 58 -j ACCEPT
+-A INPUT -p icmpv6 -j ACCEPT
 
 # accept all traffic from LAN
 -A INPUT -i eth0 -j ACCEPT
