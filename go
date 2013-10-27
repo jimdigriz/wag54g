@@ -201,6 +201,8 @@ customise () {
 			s/%DOMAIN%/$DOMAIN/; \
 			s/%LAN4IP%/$LAN4IP/" rootfs/etc/sv/dnsmasq/run
 
+	ln -s -f -T /tmp/resolv.conf rootfs/etc/ppp/resolv.conf
+
 	find rootfs -type f -name .empty -delete
 
 	rm rootfs/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
