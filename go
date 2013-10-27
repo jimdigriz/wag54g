@@ -2,6 +2,21 @@
 
 set -eu
 
+clean () {
+	rm -rf rootfs
+	rm -f firmware-code.bin
+	rm -f fs.img
+	rm -f src/linux-atm-2.5.2.tar.gz
+	rm -rf src/linux-atm-2.5.2
+	rm -f src/sangam_atm-D7.05.01.00-R1.tar.bz2
+	rm -rf src/sangam_atm-D7.05.01.00/
+	rm -rf tools
+	rm -f vmlinuz.bin
+	rm -f vmlinuz.srec
+
+	rm -rf src/buildroot/output
+}
+
 ar7flashtools () {
 	mkdir -p tools
 
@@ -95,6 +110,7 @@ iface lo inet6 static
 auto eth0
 iface eth0 inet static
 	pre-up	modprobe cpmac
+	pre-up  ethtool --set-ring eth0 rx 128
 	address	$LAN4IP
 	netmask	$LAN4SN
 iface eth0 inet6 static
@@ -232,10 +248,10 @@ customise () {
 sangam () {
 	[ -f rootfs/lib/modules/$BR2_LINUX_KERNEL_VERSION/kernel/drivers/net/tiatm.ko ] && return
 
-	wget -P src -N http://downloads.openwrt.org/sources/sangam_atm-D7.05.01.00-R1.tar.bz2
+	wget -P dl -N http://downloads.openwrt.org/sources/sangam_atm-D7.05.01.00-R1.tar.bz2
 
 	rm -rf src/sangam_atm-D7.05.01.00
-	tar -xC src -f src/sangam_atm-D7.05.01.00-R1.tar.bz2
+	tar -xC src -f dl/sangam_atm-D7.05.01.00-R1.tar.bz2
 
 	find src/openwrt/package/kernel/ar7-atm/patches-D7.05.01.00 -type f -name '*.patch' \
 		| sort \
@@ -253,10 +269,10 @@ sangam () {
 pppoe () {
 	[ -x rootfs/sbin/br2684ctl ] && return
 
-	wget -P src -N --content-disposition http://sourceforge.net/projects/linux-atm/files/latest/download
+	wget -P dl -N --content-disposition http://sourceforge.net/projects/linux-atm/files/latest/download
 
 	rm -rf src/linux-atm-2.5.2
-	tar -xC src -f src/linux-atm-2.5.2.tar.gz
+	tar -xC src -f dl/linux-atm-2.5.2.tar.gz
 
 	cd src/linux-atm-2.5.2
 
@@ -286,6 +302,11 @@ bake () {
 
 	( dd if=/dev/zero bs=16 count=1; dd if=vmlinuz.bin bs=786432 conv=sync; cat fs.img ) | tools/addpattern -o firmware-code.bin -p WA21
 }
+
+if [ "${1:-}" = "clean" ]; then
+	clean
+	exit 0
+fi
 
 if [ -f local ]; then
 	. ./local
