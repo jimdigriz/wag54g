@@ -16,7 +16,7 @@
 # ssh
 -A INPUT -p tcp --dport 22 --syn -j ssh
 # ntp
--A INPUT -p udp --dport 123 -j REJECT --reject-with icmp-port-unreachable
+-A INPUT -p udp --dport 123 -j REJECT --reject-with icmp6-port-unreachable
 
 # dnsmasq authoritive
 -A INPUT -p udp --dport 53 -j ACCEPT
@@ -37,7 +37,7 @@
 -A INPUT        -m hashlimit --hashlimit-name reject-ipv6 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-upto 10/min -j REJECT --reject-with icmp6-adm-prohibited
 
 -A ssh -m recent --name SSH --set
--A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -m limit -j REJECT --reject-with icmp-admin-prohibited
+-A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -m limit -j REJECT --reject-with icmp6-adm-prohibited
 -A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -j DROP
 
 COMMIT
