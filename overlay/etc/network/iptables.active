@@ -26,7 +26,7 @@
 -A INPUT -p tcp --dport 53 -j ACCEPT
 
 # traceroute
--A INPUT -p udp --sport 1024: --dport 33434:33689 -m hl --hl-eq 1 -j ACCEPT
+-A INPUT -p udp --sport 1024: --dport 33434:33689 -m ttl --ttl-eq 1 -j ACCEPT
 
 # ident speed up and removing of log noise
 -A INPUT -p tcp --dport 113 -j REJECT --reject-with tcp-reset
@@ -39,9 +39,8 @@
 -A INPUT -p tcp -m hashlimit --hashlimit-name reject-ipv4 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-upto 10/min -j REJECT --reject-with tcp-reset
 -A INPUT        -m hashlimit --hashlimit-name reject-ipv4 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-upto 10/min -j REJECT --reject-with icmp-admin-prohibited
 
--A ssh -m recent --name SSH --set
--A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -m limit -j REJECT --reject-with icmp-admin-prohibited
--A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -j DROP
+-A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -j RETURN
+-A ssh -m recent --name SSH --set -j ACCEPT
 
 COMMIT
 

@@ -8,7 +8,8 @@
 -A INPUT -m state --state INVALID,UNTRACKED -j DROP
 
 -A INPUT -i lo -j ACCEPT
--A INPUT -p icmpv6 -j ACCEPT
+# ipv6-icmp
+-A INPUT -p 58 -j ACCEPT
 
 # accept all traffic from LAN
 -A INPUT -i eth0 -j ACCEPT
@@ -36,9 +37,8 @@
 -A INPUT -p tcp -m hashlimit --hashlimit-name reject-ipv6 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-upto 10/min -j REJECT --reject-with tcp-reset
 -A INPUT        -m hashlimit --hashlimit-name reject-ipv6 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-upto 10/min -j REJECT --reject-with icmp6-adm-prohibited
 
--A ssh -m recent --name SSH --set
--A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -m limit -j REJECT --reject-with icmp6-adm-prohibited
--A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -j DROP
+-A ssh -m recent --name SSH --update --seconds 300 --hitcount 3 -j RETURN
+-A ssh -m recent --name SSH --set -j ACCEPT
 
 COMMIT
 
