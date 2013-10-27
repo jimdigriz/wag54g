@@ -7,7 +7,7 @@ exec /usr/sbin/dnsmasq \
 	--keep-in-foreground \
 	--interface eth0 \
 	--auth-server=%DOMAIN%,ppp0 \
-	--bind-interfaces \
+	--auth-zone=%DOMAIN%,%WAN6NT%::/48 \
 	--bogus-priv \
 	--stop-dns-rebind \
 	--rebind-localhost-ok \
