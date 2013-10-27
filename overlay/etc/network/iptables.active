@@ -10,7 +10,8 @@
 -A INPUT -i lo -j ACCEPT
 -A INPUT -p icmp -j ACCEPT
 -A INPUT -p igmp -j ACCEPT
--A INPUT -p 41 -j ACCEPT	# ipv6
+# ipv6
+-A INPUT -p 41 -j ACCEPT
 
 # accept all traffic from LAN
 -A INPUT -i eth0 -j ACCEPT
