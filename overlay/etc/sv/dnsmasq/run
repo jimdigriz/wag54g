@@ -9,7 +9,6 @@ exec /usr/sbin/dnsmasq \
 	--auth-server=%DOMAIN%,ppp0 \
 	--bind-interfaces \
 	--bogus-priv \
-	--resolv-file=/etc/ppp/resolv.conf \
 	--stop-dns-rebind \
 	--rebind-localhost-ok \
 	--domain-needed \
