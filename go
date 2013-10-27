@@ -244,6 +244,8 @@ customise () {
 		| grep -v '\.\(ko\|bin\)$' \
 		| grep -v -e routef -e routel -e rtpr \
 		| xargs -n1 src/buildroot/output/host/usr/bin/mipsel-linux-sstrip
+
+	ln -s -f -T ../bin/busybox rootfs/sbin/ip
 }
 
 sangam () {
