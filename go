@@ -196,7 +196,7 @@ customise () {
 
 	sed -i "s/%DHCPS%/$DHCPS/; \
 			s/%DHCPF%/$DHCPF/; \
-			s/%WAN6IP%/$WAN6IP/; \
+			s/%WAN4IP%/$WAN4IP/; \
 			s/%WAN6NT%/$WAN6NT/; \
 			s/%LAN6NT%/$LAN6NT/; \
 			s/%DOMAIN%/$DOMAIN/; \
