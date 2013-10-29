@@ -10,3 +10,4 @@
     --auth-peer=188.246.204.87,2a03:9800:10:2d:3203:b3a5:8bdc:5b68'
 * firewall (inc TCPMSS bits)
 * QoS and add de-bufferbloat bits
+* 192.88.99.1 and 2002:: (6to4) is unreachable
