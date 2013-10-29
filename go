@@ -177,7 +177,11 @@ customise () {
 	rsync -rl overlay/ rootfs
 
 	echo -n $HOSTNAME > rootfs/etc/hostname
-	sed -i "s/%HOSTNAME%/$HOSTNAME/g; s/%DOMAIN%/$DOMAIN/" rootfs/etc/hosts
+	sed -i "s/%HOSTNAME%/$HOSTNAME/g; \
+			s/%DOMAIN%/$DOMAIN/; \
+			s/%LAN4IP%/$LAN4IP/; \
+			s/%WAN4IP%/$WAN4IP/; \
+			s/%WAN6NT%/$WAN6NT/;" rootfs/etc/hosts
 
 	interfaces
 	accounts
