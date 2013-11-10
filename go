@@ -75,7 +75,7 @@ iface lo inet loopback
 	up	ip route add unreachable 172.16.0.0/12
 	up	ip route add unreachable 192.0.0.0/24
 	up	ip route add unreachable 192.0.2.0/24
-	$V66TO4	ip route add unreachable 192.88.99.0/24
+	#$V66TO4	ip route add unreachable 192.88.99.0/24
 	up	ip route add unreachable 192.168.0.0/16
 	up	ip route add unreachable 198.18.0.0/15
 	up	ip route add unreachable 198.51.100.0/24
@@ -99,7 +99,7 @@ iface lo inet6 static
 	up	ip route add unreachable 2001:2::/48
 	up	ip route add unreachable 2001:db8::/32
 	up	ip route add unreachable 2001:10::/28
-	$V6REAL	ip route add unreachable 2002::/16
+	#$V6REAL	ip route add unreachable 2002::/16
 	up	ip route add unreachable fc00::/7
 
 	# blackhole our allocation to prevent loops
