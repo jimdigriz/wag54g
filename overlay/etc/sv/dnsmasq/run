@@ -8,7 +8,7 @@ exec /usr/sbin/dnsmasq \
 	--interface eth0 \
 	--auth-server=ns.%DOMAIN%,ppp0 \
 	--host-record=ns.%DOMAIN%,%WAN4IP%,%WAN6NT%:: \
-	--auth-zone=digriz.wormnet.eu,%WAN4IP%,%WAN6NT%::/48 \
+	--auth-zone=%DOMAIN%,%WAN4IP%,%WAN6NT%::/48 \
 	--bogus-priv \
 	--stop-dns-rebind \
 	--rebind-localhost-ok \
