@@ -4,6 +4,15 @@ set -eu
 
 exec 2>&1
 
+# stop the blinking
+for I in 4 5 8; do
+	[ -d /sys/class/gpio/gpio$I ] && continue
+
+	echo $I > /sys/class/gpio/export
+	echo out > /sys/class/gpio/gpio$I/direction
+	echo 1 > /sys/class/gpio/gpio$I/value
+done
+
 modprobe tiatm
 
 I=0
